@@ -1,0 +1,28 @@
+[
+
+{
+    "testcaseId":"TC001",
+    "username":"automate.crm",
+    "password":"test@123"
+},
+{
+    "testcaseId":"TC002",
+    "username":"automate.test",
+    "password":"test@123"
+},
+{
+    "testcaseId":"TC003",
+     "username":"automate.lead",
+    "password":"test@123"
+},
+{
+    "testcaseId":"TC004",
+     "username":"automate.admin",
+    "password":"test@123"
+},
+{
+    "testcaseId":"TC005",
+    "username":"automate.marketing",
+    "password":"test@123"
+}
+]

@@ -1,0 +1,327 @@
+import test from "@playwright/test";
+
+import * as xslx from "xlsx";
+
+const workBook=xslx.readFile("resources/userRole.xlsx");
+// const workBook=xslx.readFile(require('path').join(__dirname, '../resources/userRole.xslx'));
+const sheet=workBook.Sheets[workBook.SheetNames[0]];
+const userRoles:any[]=xslx.utils.sheet_to_json(sheet);
+
+for(let users of userRoles){
+
+test(`CRM- user roles ${users.Test_Id}`, async({page})=>{
+
+    await page.goto("https://apps.theauto-mate.com/crm/login.php");
+
+    await page.getByRole("textbox",{name:"Username"}).fill(users.Username);
+
+    await page.getByRole("textbox",{name:"Password"}).fill(users.Password);
+
+    await page.getByRole("button",{name:"Sign In"}).click();
+
+   
+});
+}
+
+# ---------------------------------
+
+import {test} from "@playwright/test";
+import {parse} from "csv-parse/sync";
+import fs from 'fs';
+
+const userRoles:any[]=parse(fs.readFileSync("resources/Shri_User.csv"),{
+    skip_empty_lines:true,
+    columns:true
+});
+
+
+for( let user of userRoles){
+
+test(`CRM use roles - ${user.TESTCASE_ID }`, async({page})=>{
+
+    await page.goto("https://apps.theauto-mate.com/crm/login.php");
+
+    await page.getByRole("textbox",{name:"Username"}).fill(user.USERNAME);
+
+    await page.getByRole("textbox",{name:"Password"}).fill(user.PASSWORD);
+
+    await page.getByRole("button",{name:"Sign In"}).click();
+
+   
+});
+}
+
+
+# ============================================
+
+Test Case:
+-------------
+TestCase 001: Create lead and verify
+
+1. Navigate to https://apps.theauto-mate.com/crm - automate.crm/test@123
+2. Click on contact/leads
+3. Add new contact
+4. Enter values in all the fields and click Add
+5. Verify "Lead added successfully" message is displayed
+6. Verify added lead is displayed in leads page
+# ------------------------------------------
+import { test, expect } from "@playwright/test";
+
+test("Add Lead", async ({ page, context }) => {
+  await page.goto("https://apps.theauto-mate.com/crm/login.php");
+
+  await page.getByRole("textbox", { name: "Username" }).fill("automate.crm");
+  await page.getByRole("textbox", { name: "Password" }).fill("test@123");
+  await page.getByRole("button", { name: "Sign In" }).click();
+
+  await page.getByRole("link", { name: "Contacts / Leads" }).click();
+  
+  const newPagePromise = context.waitForEvent("page");
+  await page.getByRole("link", { name: "Add New Contact" }).click();
+  const detailsPage = await newPagePromise;
+
+  await detailsPage.locator("#contact_name").fill("lavanyak");
+  await detailsPage.locator("#email").fill("Lavanya96@gmail.com");
+  await detailsPage.locator("#phone").fill("9789109430");
+  await detailsPage.locator("#company").fill("TechM");
+
+  await detailsPage.getByRole("radio", { name: "Female" }).check();
+  await detailsPage.locator("#status").selectOption("Active");
+  await detailsPage.locator("#source").selectOption("Website");
+
+  await detailsPage.locator("#lead_score").fill("8");
+  await detailsPage.locator("#deals").fill("5");
+  await detailsPage.locator("#total_value").fill("4");
+
+  await detailsPage.getByRole("checkbox", { name: "CRM" }).check();
+  await detailsPage.locator("#priority").selectOption("High");
+
+  await detailsPage.locator("#last_contact").fill("2026-02-03");
+  await detailsPage.locator("#notes").fill("person details");
+
+  await detailsPage.getByRole("button", { name: "Add" }).click();
+
+  await expect(detailsPage.getByText("Lead added successfully!")).toBeVisible();
+
+  await detailsPage.close();
+
+  await expect(page.getByText("lavanyak", { exact: true })).toBeVisible();
+
+  console.log("Lead added successfully");
+
+});
+# -----------------------------------------------
+
+TestCase 002: Delete lead
+
+1. Navigate to https://apps.theauto-mate.com/crm - automate.crm/test@123
+2. Click on contact/leads
+3. Click on delete lead on the lead that you created in TC001
+4. Verify "Are you sure you want to delete this contact?" alert message is displayed
+5. Accept alert
+6. Accept - "Contact deleted successfully" alert
+7. Verify lead is delete in leads page
+# ===========================================
+
+import { test, expect } from "@playwright/test";
+
+test("Delete existing lead", async ({ page }) => {
+  await page.goto("https://apps.theauto-mate.com/crm/login.php");
+
+  await page.getByRole("textbox", { name: "Username" }).fill("automate.crm");
+  await page.getByRole("textbox", { name: "Password" }).fill("test@123");
+  await page.getByRole("button", { name: "Sign In" }).click();
+
+  await page.getByRole("link", { name: "Contacts / Leads" }).click();
+
+  const leadName = "lavanyak";
+  const leadRow = page.getByRole("row", { name: leadName });
+
+  await expect(leadRow.first()).toBeVisible();
+
+  page.on("dialog", async (dialog) => {
+    // expect(dialog.message()).toContain("Are you sure you want to delete this contact?");
+    // await dialog.accept();
+
+    // const successMessage = await page.waitForEvent("dialog");
+    // expect(successMessage.message()).toContain("Contact deleted successfully");
+    await dialog.accept();
+  });
+
+
+
+  await leadRow.first().locator("button", { hasText: "Delete" }).click();
+
+  console.log("Lead deleted successfully");
+});
+# ===========================================
+
+TestCase 003: Upload profile pic
+
+1. Navigate to https://apps.theauto-mate.com/crm - automate.crm/test@123
+2. Click on users icon
+3. Click on automate.crm
+4. Upload the profile pic and click on upload photo
+
+# ======================================================
+import { test, expect } from "@playwright/test";
+
+test("Delete existing lead", async ({ page }) => {
+  await page.goto("https://apps.theauto-mate.com/crm/login.php");
+
+  await page.getByRole("textbox", { name: "Username" }).fill("automate.crm");
+  await page.getByRole("textbox", { name: "Password" }).fill("test@123");
+  await page.getByRole("button", { name: "Sign In" }).click();
+
+  await page.locator("#userDropdownButton").click();
+  await page.getByText("automate.crm", { exact: true }).click();
+
+  const fileInput = page.locator("input[name='profile_image']");
+  await fileInput.setInputFiles("./resources/PW_Logo.jpg");
+
+  await page.getByText("Upload Photo").click();
+
+});
+# =====================================================
+
+Hooks
+------
+Before All   - once
+
+beforeeach   
+test("1")
+aftereach
+
+beforeeach
+test("2")
+aftereach
+
+beforeeach
+test("3")
+aftereach
+
+AfterAll
+
+-----------------------------
+beforeAll     page,context  - cant able to use
+
+before each
+test(1)
+test(2)
+after each
+
+afterAll  page, context  - cant able to use
+
+
+amazon   ->  api     ->db
+user     <-api      <-db
+
+3 tier process  ---database  establish - beforeall afteralll 
+
+# ------------------------------------------
+playwright Architecture
+
+
+selenium  
+
+interaction1  -- con open   respond   con close
+interaction2  -- con open   respond   con close
+interaction3  -- con open   respond   con close
+interaction4  -- con open   respond   con close
+
+
+playwright
+
+connection open    
+                    ------interactions ---  
+                    ----interaction2-------
+                    ---interaction3-------
+
+connection closed
+
+
+
+typescript     -  support add on benefits
+ -  javascript 
+
+
+ javascript dynamic lang   -  let a=true
+ typescript  static lang   -  a:string="js"
+
+
+ //array
+ //object
+ //tuple
+ //unknown
+ //never
+ //union
+ //intersection
+ //enum
+ //type alias
+ //optional parameter 
+// default parameter
+
+# ---------------------------------------
+
+oops  -  object oriented prgramming structure
+
+Class   -  object
+
+class{  
+
+
+       }
+
+object
+
+inheritance   -   can access one class property from another - extends
+Abstraction   - abstract  class -  implemented / unimplemented  (abstract method)  use - extends in another class
+Interface     - interface  -  unimplemented  (abstract method) - class - implements  -
+Method overriding  - one move from parent class to child method overriding(can change buisness logic)
+
+method loading
+--------------
+
+POM  - page object model
+
+for fakers
+------------
+npm install --save-dev @faker-js/faker
+
+
+Pom-  Promise all[]  switch to page
+ fixture  -  {page} - browser, context ,page
+ custom fixture - {login}  - url - username - password -sigin 
+
+ Fakers - npm install --save-dev @faker-js/faker
+
+
+https://www.npmjs.com/package/allure-playwright
+
+
+# 
+npm install -g allure-commandline 
+allure --version
+allure serve ./allure-results
+# 
+
+----------------------------------------------
+Screenshot
+
+   screenshot:'on',
+    video:'on',
+    trace: 'on',
+
+Debug  -  To fix the bug  - to find out the root case
+Breakpoint   - Before reaching breakpoint automatically run
+
+once reaching breakpoint we have to run manually
+step over  - next next line 
+step into  - method enter
+step out    - to return to file 
+
+
+# ------------------------
+
+Allure report
+--------------
