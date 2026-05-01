@@ -81,12 +81,8 @@ const addNewContact=new AddNewContact(newPage1,context)
 //fakers  - L
 
 
-await addNewContact.enterName("Jai");
-await addNewContact.enterEmail("jai@gmail.com");
-await addNewContact.enterPhn("87654356789");
-
-
-
-
+// await addNewContact.enterName("Jai");
+// await addNewContact.enterEmail("jai@gmail.com");
+// await addNewContact.enterPhn("87654356789");
 
 })
