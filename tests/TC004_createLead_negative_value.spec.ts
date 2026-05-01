@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("Delete existing lead", async ({ page }) => {
+test("Add contact  lead", async ({ page }) => {
   await page.goto("https://apps.theauto-mate.com/crm/login.php");
 
   await page.getByRole("textbox", { name: "Username" }).fill("automate.crm");
