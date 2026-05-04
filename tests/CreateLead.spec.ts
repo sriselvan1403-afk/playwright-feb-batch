@@ -1,16 +1,11 @@
 import { test } from "@playwright/test";
 
-test("Add Lead", async ({ page, context }) => {
+test.only("Add Lead", async ({ page, context }) => {
   await page.goto("https://apps.theauto-mate.com/crm/login.php");
 
-  await test.step("enter username ", async () => {
+
     await page.getByRole("textbox", { name: "Username" }).fill("automate.crm");
-  });
-
-  await test.step("enter password", async () => {
     await page.getByRole("textbox", { name: "Password" }).fill("test@123");
-  });
-
   await page.getByRole("button", { name: "Sign In" }).click();
 
   await page.getByRole("link", { name: "Contacts / Leads" }).click();
